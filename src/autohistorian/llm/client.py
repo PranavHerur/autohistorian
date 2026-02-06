@@ -23,7 +23,7 @@ from .prompts import (
 class RateLimiter:
     """Token bucket rate limiter for API calls."""
 
-    def __init__(self, requests_per_minute: int = 20):
+    def __init__(self, requests_per_minute: int = 10):  # Conservative for Gemini free tier
         self.requests_per_minute = requests_per_minute
         self.min_interval = 60.0 / requests_per_minute
         self._last_request_time = 0.0
@@ -114,13 +114,14 @@ class GeminiClient:
                 is_retriable = (
                     "429" in str(e)
                     or "quota" in error_str
+                    or "exhausted" in error_str
                     or "disconnected" in error_str
                     or "connection" in error_str
                     or "timeout" in error_str
                     or "server error" in error_str
                 )
                 if is_retriable and attempt < self.max_retries - 1:
-                    wait_time = (attempt + 1) * 10
+                    wait_time = (attempt + 1) * 30  # Wait longer (30s per retry)
                     await asyncio.sleep(wait_time)
                     continue
                 raise
