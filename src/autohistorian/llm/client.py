@@ -109,8 +109,17 @@ class GeminiClient:
                 )
                 return response.text
             except Exception as e:
-                if "429" in str(e) or "quota" in str(e).lower():
-                    # Rate limited, wait and retry
+                error_str = str(e).lower()
+                # Retry on rate limits or transient connection errors
+                is_retriable = (
+                    "429" in str(e)
+                    or "quota" in error_str
+                    or "disconnected" in error_str
+                    or "connection" in error_str
+                    or "timeout" in error_str
+                    or "server error" in error_str
+                )
+                if is_retriable and attempt < self.max_retries - 1:
                     wait_time = (attempt + 1) * 10
                     await asyncio.sleep(wait_time)
                     continue
