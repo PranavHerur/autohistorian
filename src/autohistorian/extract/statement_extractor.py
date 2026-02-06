@@ -47,7 +47,7 @@ class StatementExtractor:
             statement = Statement(
                 id=uuid4(),
                 content=raw.get("content", ""),
-                speaker=raw.get("speaker", "Unknown"),
+                speaker=raw.get("speaker") or "Unknown",
                 speaker_role=raw.get("speaker_role"),
                 stance=raw.get("stance"),
                 target=raw.get("target"),
