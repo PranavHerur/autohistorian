@@ -45,6 +45,7 @@ def ingest(
     days: int = typer.Option(7, "--days", "-d", help="Number of days to look back"),
     max_articles: int = typer.Option(50, "--max", "-m", help="Maximum articles to fetch"),
     sections: Optional[str] = typer.Option(None, "--sections", "-s", help="Comma-separated sections (e.g., 'Politics,U.S.')"),
+    model: Optional[str] = typer.Option(None, "--model", help="Gemini model to use (e.g., gemini-2.5-flash-preview-05-20)"),
     data_dir: Optional[str] = typer.Option(None, "--data-dir", help="Data directory"),
 ):
     """Ingest articles from the last N days and auto-discover topics.
@@ -73,7 +74,7 @@ def ingest(
         from .llm.client import GeminiClient
 
         nyt_client = NYTClient(nyt_key)
-        llm_client = GeminiClient(gemini_key, model=settings.gemini_model)
+        llm_client = GeminiClient(gemini_key, model=model or settings.gemini_model)
         store = KnowledgeStore(data_dir)
         pipeline = ExtractionPipeline(llm_client)
 
@@ -143,6 +144,7 @@ def generate(
     topic: str = typer.Argument(..., help="Topic to generate article for"),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file path"),
     perspectives: bool = typer.Option(False, "--perspectives", "-p", help="Include perspectives section"),
+    model: Optional[str] = typer.Option(None, "--model", help="Gemini model to use"),
     data_dir: Optional[str] = typer.Option(None, "--data-dir", help="Data directory"),
 ):
     """Generate a Wikipedia-style article for a topic."""
@@ -155,7 +157,7 @@ def generate(
         from .llm.client import GeminiClient
         from .synthesize.writer import ArticleWriter
 
-        llm_client = GeminiClient(gemini_key, model=settings.gemini_model)
+        llm_client = GeminiClient(gemini_key, model=model or settings.gemini_model)
         store = KnowledgeStore(data_dir)
         writer = ArticleWriter(llm_client, store)
 
@@ -196,6 +198,7 @@ def timeline(
     format: str = typer.Option("table", "--format", "-f", help="Output format: table, json, timelinejs"),
     valid_time: bool = typer.Option(True, "--valid-time/--obs-time", help="Use valid time (when happened) or observation time (when reported)"),
     output: Optional[str] = typer.Option(None, "--output", "-o", help="Output file path"),
+    model: Optional[str] = typer.Option(None, "--model", help="Gemini model to use"),
     data_dir: Optional[str] = typer.Option(None, "--data-dir", help="Data directory"),
 ):
     """Display or export timeline for a topic."""
@@ -227,7 +230,7 @@ def timeline(
     elif format == "timelinejs":
         # Need LLM client for writer
         _, gemini_key = get_api_keys()
-        llm_client = GeminiClient(gemini_key, model=settings.gemini_model)
+        llm_client = GeminiClient(gemini_key, model=model or settings.gemini_model)
         writer = ArticleWriter(llm_client, store)
         output_data = json.dumps(writer.export_timeline_json(topic), indent=2)
         if output:
@@ -338,6 +341,7 @@ def ingest_archive(
     query: Optional[str] = typer.Option(None, "--query", "-q", help="Filter articles by keyword in headline/abstract"),
     sections: Optional[str] = typer.Option(None, "--sections", "-s", help="Comma-separated sections to filter"),
     max_articles: int = typer.Option(100, "--max", "-m", help="Maximum articles to process"),
+    model: Optional[str] = typer.Option(None, "--model", help="Gemini model to use"),
     archive_dir: Optional[str] = typer.Option(None, "--archive-dir", help="Archive directory"),
     data_dir: Optional[str] = typer.Option(None, "--data-dir", help="Data directory for knowledge store"),
 ):
@@ -468,7 +472,7 @@ def ingest_archive(
         from .knowledge.store import KnowledgeStore
         from .llm.client import GeminiClient
 
-        llm_client = GeminiClient(gemini_key, model=settings.gemini_model)
+        llm_client = GeminiClient(gemini_key, model=model or settings.gemini_model)
         store = KnowledgeStore(data_dir)
         pipeline = ExtractionPipeline(llm_client)
 
