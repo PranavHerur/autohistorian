@@ -23,8 +23,8 @@ def get_settings() -> Settings:
     load_dotenv()
 
     return Settings(
-        nyt_api_key=os.getenv("AUTOHISTORIAN_NYT_API_KEY"),
-        gemini_api_key=os.getenv("AUTOHISTORIAN_GEMINI_API_KEY"),
-        gemini_model=os.getenv("AUTOHISTORIAN_GEMINI_MODEL", "gemini-2.0-flash"),
-        data_dir=os.getenv("AUTOHISTORIAN_DATA_DIR", "data"),
+        nyt_api_key=os.getenv("NYT_API_KEY") or os.getenv("AUTOHISTORIAN_NYT_API_KEY"),
+        gemini_api_key=os.getenv("GEMINI_API_KEY") or os.getenv("AUTOHISTORIAN_GEMINI_API_KEY"),
+        gemini_model=os.getenv("GEMINI_MODEL") or os.getenv("AUTOHISTORIAN_GEMINI_MODEL", "gemini-2.0-flash"),
+        data_dir=os.getenv("DATA_DIR") or os.getenv("AUTOHISTORIAN_DATA_DIR", "data"),
     )
