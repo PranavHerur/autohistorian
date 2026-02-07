@@ -13,7 +13,7 @@ class Settings(BaseModel):
 
     nyt_api_key: Optional[str] = None
     gemini_api_key: Optional[str] = None
-    gemini_model: str = "gemini-2.5-flash-preview-05-20"
+    gemini_model: str = "gemini-2.0-flash"
     data_dir: str = "data"
 
 
